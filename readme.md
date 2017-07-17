@@ -23,7 +23,9 @@ Each Laser Egg has a unique UDID. But the API uses another ID called *Laser Egg 
 All step by step screenshots are in the `readme files` folder.
 ### Sample
 Here’s the sample config file. In this case you have two laser eggs in your home. 
-```"accessories": [
+
+```
+"accessories": [
 	{
 	"accessory": "laser-egg",
 	"name": "Laser Egg 1",
@@ -36,7 +38,9 @@ Here’s the sample config file. In this case you have two laser eggs in your ho
 	"laser_egg_id": "12346",
 	"polling": "5"
 	}
-],```
+],
+```
+
 Here are the explanations for each data field. All fields are required.
 1. `accessory`  The name of the HomeKit accessory. Use “`laser-egg`” (all lowercase).
 2. `name`  The name for the accessory. It will show in the Home app. Don’t make it too long. Otherwise it will be hard to identify.
