@@ -26,20 +26,22 @@ All step by step screenshots are in the `readme files` folder.
 Here’s the sample config file. In this case you have two laser eggs in your home. 
 
 ```
-"accessories": [
-	{
-	"accessory": "laser-egg",
-	"name": "Laser Egg 1",
-	"laser_egg_id": "12345",
-	"polling": "5"
-	},
-	{
-	"accessory": "laser-egg",
-	"name": "Laser Egg 2",
-	"laser_egg_id": "12346",
-	"polling": "5"
-	}
-],
+{
+   "accessories":[
+      {
+         "accessory":"laser-egg",
+         "name":"Laser Egg 1",
+         "laser_egg_id":"12345",
+         "polling":"5"
+      },
+      {
+         "accessory":"laser-egg",
+         "name":"Laser Egg 2",
+         "laser_egg_id":"12346",
+         "polling":"5"
+      }
+   ]
+}
 ```
 
 Here are the explanations for each data field. All fields are required.
