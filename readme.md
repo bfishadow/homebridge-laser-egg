@@ -20,6 +20,7 @@ Each Laser Egg has a unique UDID. But the API uses another ID called *Laser Egg 
 3. In the *Device Information* section, you will find a blue *copy*. Click on this to copy the UDID string.
 4. Visit the this link in Safari: [http://api-ios.origins-china.cn:8080/topdata/getTopByTimeId?timeId=YOUR\_UDID\_HERE](http://api-ios.origins-china.cn:8080/topdata/getTopByTimeId?timeId=YOUR_UDID_HERE) Replace `YOUR_UDID_HERE` with the actual UDID.
 5. You will find a JSON dataset. The five digits following `“id”:` will be the *Laser Egg ID*. Write it down. You will need this in the Homebridge configuration. 
+
 All step by step screenshots are in the `readme files` folder.
 ### Sample
 Here’s the sample config file. In this case you have two laser eggs in your home. 
