@@ -1,6 +1,6 @@
-"use strict";
-// 
-// Homebridge config.json sample, use following lines to add accessories. 
+'use strict';
+//
+// Homebridge config.json sample, use following lines to add accessories.
 // In this case you have two Laser Eggs in your house:
 //
 //  "accessories": [
@@ -19,170 +19,206 @@
 //  ],
 //
 var lowerCase = require('lower-case');
-var request = require("request");
-var striptags = require("striptags");
+var request = require('request');
+var striptags = require('striptags');
 var Service, Characteristic;
 
-var airQualityService;
-
-module.exports = function (homebridge) {
-    Service = homebridge.hap.Service;
-    Characteristic = homebridge.hap.Characteristic;
-    homebridge.registerAccessory("homebridge-laser-egg", "laser-egg", LaserEggAccessory);
-}
+module.exports = function(homebridge) {
+  Service = homebridge.hap.Service;
+  Characteristic = homebridge.hap.Characteristic;
+  homebridge.registerAccessory(
+    'homebridge-laser-egg',
+    'laser-egg',
+    LaserEggAccessory
+  );
+};
 
 function LaserEggAccessory(log, config) {
-    this.log = log;
-    this.name = config['name'];
-    this.provider = lowerCase(config['provider']) || "laser-egg";
-    this.laser_egg_id = config['laser_egg_id'];
-    this.mpolling = config['polling'] || '0';
-	this.polling = this.mpolling;
+  this.log = log;
+  this.name = config['name'];
+  this.provider = lowerCase(config['provider']) || 'laser-egg';
+  this.laser_egg_id = config['laser_egg_id'];
+  this.mpolling = config['polling'] || '0';
+  this.polling = this.mpolling;
 
-	if (!this.laser_egg_id) throw new Error("Laser Egg - You must provide a config value for 'laser_egg_id'.");
+  if (!this.laser_egg_id) {
+    throw new Error(
+      "Laser Egg - You must provide a config value for 'laser_egg_id'."
+    );
+  }
 
-	if (this.polling > 0) {
-		var that = this;
-		this.polling *= 60000;
-		setTimeout(function() {
-			that.servicePolling();
-		}, this.polling);
-	};
+  if (this.polling > 0) {
+    var that = this;
+    this.polling *= 60000;
+    setTimeout(function() {
+      that.servicePolling();
+    }, this.polling);
+  }
 
-	this.log.info("Laser Egg Polling (minutes) is: %s", (this.polling == '0') ? 'OFF' : this.mpolling);
-
+  this.log.info(
+    'Laser Egg Polling (minutes) is: %s',
+    this.polling === '0' ? 'OFF' : this.mpolling
+  );
 }
 
 LaserEggAccessory.prototype = {
+  servicePolling: function() {
+    this.log.info('Laser Egg Polling...');
+    this.getObservation(
+      function(p) {
+        var that = this;
+        that.airQualityService.setCharacteristic(Characteristic.AirQuality, p);
+        setTimeout(function() {
+          that.servicePolling();
+        }, that.polling);
+      }.bind(this)
+    );
+  },
 
-	servicePolling: function(){
-		this.log.info('Laser Egg Polling...');
-		this.getObservation(function(p) {
-			var that = this;
-			that.airQualityService.setCharacteristic(Characteristic.AirQuality, p);
-			setTimeout(function() {
-				that.servicePolling();
-			}, that.polling);
-		}.bind(this));
-	},
+  getAirQuality: function(callback) {
+    this.getObservation(function(a) {
+      callback(null, a);
+    });
+  },
 
-    getAirQuality: function(callback){
-        this.getObservation(function(a) {
-            callback(null, a);
-        });
-    },
+  getObservation: function(callback) {
+    var that = this;
+    var url, pm2_5;
 
-    getObservation: function (callback) {
-    	var that = this;
-		var url, pm2_5;
+    url =
+      'http://api-ios.origins-china.cn:8080/topdata/getTopDetail?id=' +
+      this.laser_egg_id;
 
-        url = "http://api-ios.origins-china.cn:8080/topdata/getTopDetail?id=" + this.laser_egg_id;
-
-        request({
-            url: url,
-            json: true
-        }, function (err, response, jsonObject) {
-            if (!err && response.statusCode === 200 && jsonObject.msg == "Succeed"){
-                that.log.info("Laser Egg PM2.5: %d, PM10: %d", jsonObject.pm2_5, jsonObject.pm10);
-                that.airQualityService.setCharacteristic(Characteristic.StatusFault,0);
-                if (jsonObject.hasOwnProperty('pm2_5')) {
-                    that.airQualityService.setCharacteristic(Characteristic.PM2_5Density, jsonObject.pm2_5);
-                    pm2_5 = jsonObject.pm2_5;
-                }
-                if (jsonObject.hasOwnProperty('pm10')) {
-                    that.airQualityService.setCharacteristic(Characteristic.PM10Density, jsonObject.pm10);
-                }
-            } else {
-                that.log.error("Laser Egg Unknown Error from %s.", that.provider);
-                that.airQualityService.setCharacteristic(Characteristic.StatusFault,1);
-            }
-            var aqi = that.calcAQI(pm2_5);
-            that.log.info("Laser Egg AQI: %d", aqi);
-            callback(that.trans_aqi(aqi));
-        });
-	},
-
-    trans_aqi: function (aqi) {
-		if (!aqi) {
-			return(0); // Error or unknown response
-		} else if (aqi <= 50) {
-			return(1); // Return EXCELLENT
-		} else if (aqi >= 51 && aqi <= 100) {
-			return(2); // Return GOOD
-		} else if (aqi >= 101 && aqi <= 150) {
-			return(3); // Return FAIR
-		} else if (aqi >= 151 && aqi <= 200) {
-			return(4); // Return INFERIOR
-		} else if (aqi >= 201) {
-			return(5); // Return POOR
-		} else {
-			return(0); // Error
-		}
-    },
-
-    calcAQI: function(pm2_5) {
-        function Linear(AQIhigh, AQIlow, Conchigh, Conclow, Concentration) {
-            var linear;
-            var Conc=parseFloat(Concentration);
-            var a;
-            a=((Conc-Conclow)/(Conchigh-Conclow))*(AQIhigh-AQIlow)+AQIlow;
-            linear=Math.round(a);
-            return linear;
+    request(
+      {
+        url: url,
+        json: true,
+      },
+      function(err, response, jsonObject) {
+        if (
+          !err &&
+          response.statusCode === 200 &&
+          jsonObject.msg === 'Succeed'
+        ) {
+          that.log.info(
+            'Laser Egg PM2.5: %d, PM10: %d',
+            jsonObject.pm2_5,
+            jsonObject.pm10
+          );
+          that.airQualityService.setCharacteristic(
+            Characteristic.StatusFault,
+            0
+          );
+          if (jsonObject.hasOwnProperty('pm2_5')) {
+            that.airQualityService.setCharacteristic(
+              Characteristic.PM2_5Density,
+              jsonObject.pm2_5
+            );
+            pm2_5 = jsonObject.pm2_5;
+          }
+          if (jsonObject.hasOwnProperty('pm10')) {
+            that.airQualityService.setCharacteristic(
+              Characteristic.PM10Density,
+              jsonObject.pm10
+            );
+          }
+        } else {
+          that.log.error('Laser Egg Unknown Error from %s.', that.provider);
+          that.airQualityService.setCharacteristic(
+            Characteristic.StatusFault,
+            1
+          );
         }
+        var aqi = that.calcAQI(pm2_5);
+        that.log.info('Laser Egg AQI: %d', aqi);
+        callback(that.trans_aqi(aqi));
+      }
+    );
+  },
 
-        function getAQI (intPM25){
-            var Conc=parseFloat(intPM25);
-            var c;
-            var AQI;
-            c=(Math.floor(10*Conc))/10;
-            if (c>=0 && c<12.1) {
-                AQI=Linear(50,0,12,0,c);
-            } else if (c>=12.1 && c<35.5) {
-                AQI=Linear(100,51,35.4,12.1,c);
-            } else if (c>=35.5 && c<55.5) {
-                AQI=Linear(150,101,55.4,35.5,c);
-            } else if (c>=55.5 && c<150.5) {
-                AQI=Linear(200,151,150.4,55.5,c);
-            } else if (c>=150.5 && c<250.5) {
-                AQI=Linear(300,201,250.4,150.5,c);
-            } else if (c>=250.5 && c<350.5) {
-                AQI=Linear(400,301,350.4,250.5,c);
-            } else if (c>=350.5 && c<500.5) {
-                AQI=Linear(500,401,500.4,350.5,c);
-            } else {
-                AQI="555"; //Crazy bad for 555
-            }
-            return AQI;
-        }
-
-        return getAQI(pm2_5);
-    },
-
-
-    identify: function (callback) {
-        this.log("Identify requested!");
-        callback(); // success
-    },
-
-    getServices: function () {
-        var services = []
-        var informationService = new Service.AccessoryInformation();
-
-        informationService
-                .setCharacteristic(Characteristic.Manufacturer, 'Laser Egg')
-                .setCharacteristic(Characteristic.Model, 'Laser Egg')
-                .setCharacteristic(Characteristic.SerialNumber, "Polling: " + this.mpolling);
-		services.push(informationService);
-
-        this.airQualityService = new Service.AirQualitySensor(this.name);
-        this.airQualityService
-                .getCharacteristic(Characteristic.AirQuality)
-                .on('get', this.getAirQuality.bind(this));
-		this.airQualityService.addCharacteristic(Characteristic.StatusFault); // Used if unable to connect to AQI services
-		this.airQualityService.addCharacteristic(Characteristic.PM2_5Density);
-		this.airQualityService.addCharacteristic(Characteristic.PM10Density);
-		services.push(this.airQualityService);
-
-        return services;
+  trans_aqi: function(aqi) {
+    if (!aqi) {
+      return 0; // Error or unknown response
+    } else if (aqi <= 50) {
+      return 1; // Return EXCELLENT
+    } else if (aqi >= 51 && aqi <= 100) {
+      return 2; // Return GOOD
+    } else if (aqi >= 101 && aqi <= 150) {
+      return 3; // Return FAIR
+    } else if (aqi >= 151 && aqi <= 200) {
+      return 4; // Return INFERIOR
+    } else if (aqi >= 201) {
+      return 5; // Return POOR
+    } else {
+      return 0; // Error
     }
+  },
+
+  calcAQI: function(pm2_5) {
+    function Linear(AQIhigh, AQIlow, Conchigh, Conclow, Concentration) {
+      var linear;
+      var Conc = parseFloat(Concentration);
+      var a;
+      a = (Conc - Conclow) / (Conchigh - Conclow) * (AQIhigh - AQIlow) + AQIlow;
+      linear = Math.round(a);
+      return linear;
+    }
+
+    function getAQI(intPM25) {
+      var Conc = parseFloat(intPM25);
+      var c;
+      var AQI;
+      c = Math.floor(10 * Conc) / 10;
+      if (c >= 0 && c < 12.1) {
+        AQI = Linear(50, 0, 12, 0, c);
+      } else if (c >= 12.1 && c < 35.5) {
+        AQI = Linear(100, 51, 35.4, 12.1, c);
+      } else if (c >= 35.5 && c < 55.5) {
+        AQI = Linear(150, 101, 55.4, 35.5, c);
+      } else if (c >= 55.5 && c < 150.5) {
+        AQI = Linear(200, 151, 150.4, 55.5, c);
+      } else if (c >= 150.5 && c < 250.5) {
+        AQI = Linear(300, 201, 250.4, 150.5, c);
+      } else if (c >= 250.5 && c < 350.5) {
+        AQI = Linear(400, 301, 350.4, 250.5, c);
+      } else if (c >= 350.5 && c < 500.5) {
+        AQI = Linear(500, 401, 500.4, 350.5, c);
+      } else {
+        AQI = '555'; //Crazy bad for 555
+      }
+      return AQI;
+    }
+
+    return getAQI(pm2_5);
+  },
+
+  identify: function(callback) {
+    this.log('Identify requested!');
+    callback(); // success
+  },
+
+  getServices: function() {
+    var services = [];
+    var informationService = new Service.AccessoryInformation();
+
+    informationService
+      .setCharacteristic(Characteristic.Manufacturer, 'Laser Egg')
+      .setCharacteristic(Characteristic.Model, 'Laser Egg')
+      .setCharacteristic(
+        Characteristic.SerialNumber,
+        'Polling: ' + this.mpolling
+      );
+    services.push(informationService);
+
+    this.airQualityService = new Service.AirQualitySensor(this.name);
+    this.airQualityService
+      .getCharacteristic(Characteristic.AirQuality)
+      .on('get', this.getAirQuality.bind(this));
+    this.airQualityService.addCharacteristic(Characteristic.StatusFault); // Used if unable to connect to AQI services
+    this.airQualityService.addCharacteristic(Characteristic.PM2_5Density);
+    this.airQualityService.addCharacteristic(Characteristic.PM10Density);
+    services.push(this.airQualityService);
+
+    return services;
+  },
 };
