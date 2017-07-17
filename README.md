@@ -41,7 +41,7 @@ Here’s the sample config file. In this case you have two laser eggs in your ho
       "polling": "5"
     }
   ]
-},
+}
 ```
 
 Here are the explanations for each data field. All fields are required.
