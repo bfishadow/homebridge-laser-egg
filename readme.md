@@ -46,4 +46,4 @@ Here are the explanations for each data field. All fields are required.
 1. `accessory`  The name of the HomeKit accessory. Use "`laser-egg`" (all lowercase).
 2. `name`  The name for the accessory. It will show in the Home app. Don’t make it too long. Otherwise it will be hard to identify.
 3. `laser_egg_id`  It will guide the plugin which Laser Egg data to fetch.
-4. `polling `  The interval in minutes of fetching data. Five is enough. Please don’t abuse the API.
+4. `polling`  The interval in minutes of fetching data. Five is enough. Please don’t abuse the API.
