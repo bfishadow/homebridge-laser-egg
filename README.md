@@ -1,12 +1,12 @@
 # homebridge-laser-egg
 ## About
-This is a Homebridge plugin to add HomeKit support to the first generation Laser Egg air quality monitors.
+This is a [https://github.com/nfarina/homebridge](Homebridge) plugin to add HomeKit support to the first generation Laser Egg air quality monitors.
 
 Laser Egg is a sleek AQI monitor. However the 1st gen Laser Eggs don’t have HomeKit support, while the newer model does. This plugin will save some money if you don’t need more features but the HomeKit integration.
 
 This plugin was inspired by [https://github.com/ToddGreenfield/homebridge-airnow](https://github.com/ToddGreenfield/homebridge-airnow), a plugin which fetch data through API. The Laser Egg doesn’t have an API. Yet we analyzed the iOS app traffic and find the data points. These data, however, are not encrypted.
 
-@Ohdarling contributed all the codes. @bfishadow found the data source and wrote this readme.
+[https://twitter.com/ohdarling88](@ohdarling88) contributed all the codes. [https://twitter.com/bfishadow](@bfishadow) found the data source and wrote this readme.
 
 ## Usage
 1. Install this plugin by `npm install -g homebridge-laser-egg`
@@ -25,22 +25,22 @@ All step by step screenshots are in the `readme files` folder.
 ### Sample
 Here’s the sample config file. In this case you have two laser eggs in your home. 
 
-```
+```json
 {
-  "accessories": [
-    {
-      "accessory": "laser-egg",
-      "name": "Laser Egg 1",
-      "laser_egg_id": "12345",
-      "polling": "5"
-    },
-    {
-      "accessory": "laser-egg",
-      "name": "Laser Egg 2",
-      "laser_egg_id": "12346",
-      "polling": "5"
-    }
-  ]
+   "accessories":[
+      {
+         "accessory":"laser-egg",
+         "name":"Laser Egg 1",
+         "laser_egg_id":"12345",
+         "polling":"5"
+      },
+      {
+         "accessory":"laser-egg",
+         "name":"Laser Egg 2",
+         "laser_egg_id":"12346",
+         "polling":"5"
+      }
+   ]
 }
 ```
 
@@ -48,4 +48,4 @@ Here are the explanations for each data field. All fields are required.
 1. `accessory`  The name of the HomeKit accessory. Use "`laser-egg`" (all lowercase).
 2. `name`  The name for the accessory. It will show in the Home app. Don’t make it too long. Otherwise it will be hard to identify.
 3. `laser_egg_id`  It will guide the plugin which Laser Egg data to fetch.
-4. `polling `  The interval in minutes of fetching data. Five is enough. Please don’t abuse the API.
+4. `polling`  The interval in minutes of fetching data. Five is enough. Please don’t abuse the API.
