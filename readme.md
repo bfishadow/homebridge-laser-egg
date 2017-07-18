@@ -1,12 +1,12 @@
 # homebridge-laser-egg
 ## About
-This is a Homebridge plugin to add HomeKit support to the first generation Laser Egg air quality monitors.
+This is a [https://github.com/nfarina/homebridge](Homebridge) plugin to add HomeKit support to the first generation Laser Egg air quality monitors.
 
 Laser Egg is a sleek AQI monitor. However the 1st gen Laser Eggs don’t have HomeKit support, while the newer model does. This plugin will save some money if you don’t need more features but the HomeKit integration.
 
-This plugin was inspired by [https://github.com/ToddGreenfield/homebridge-airnow](https://github.com/ToddGreenfield/homebridge-airnow), a plugin which fetch data through API. The Laser Egg doesn’t have an API. Yet we analyzed the iOS app traffic and find the data points. These data, however, are not encrypted.
+This plugin was inspired by [https://github.com/ToddGreenfield/homebridge-airnow](github.com/ToddGreenfield/homebridge-airnow), a plugin which fetch data through API. The Laser Egg doesn’t have an API. Yet we analyzed the iOS app traffic and find the data points. These data, however, are not encrypted.
 
-@Ohdarling contributed all the codes. @bfishadow found the data source and wrote this readme.
+[https://twitter.com/ohdarling88](@ohdarling88) contributed all the codes. [https://twitter.com/bfishadow](@bfishadow) found the data source and wrote this readme.
 
 ## Usage
 1. Install this plugin by `npm install -g homebridge-laser-egg`
@@ -19,7 +19,7 @@ Each Laser Egg has a unique UDID. But the API uses another ID called *Laser Egg 
 2. Click *configure* icon, a gear in a circle.
 3. In the *Device Information* section, you will find a blue *copy*. Click on this to copy the UDID string.
 4. Visit the this link in Safari: [http://api-ios.origins-china.cn:8080/topdata/getTopByTimeId?timeId=YOUR\_UDID\_HERE](http://api-ios.origins-china.cn:8080/topdata/getTopByTimeId?timeId=YOUR_UDID_HERE) Replace `YOUR_UDID_HERE` with the actual UDID.
-5. You will find a JSON dataset. The five digits following "`id`": will be the *Laser Egg ID*. Write it down. You will need this in the Homebridge configuration. 
+5. You will find a JSON dataset. The five digits following `"id":` will be the *Laser Egg ID*. Write it down. You will need this in the Homebridge configuration. 
 
 All step by step screenshots are in the `readme files` folder.
 ### Sample
