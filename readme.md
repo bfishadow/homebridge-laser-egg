@@ -56,11 +56,11 @@ Here are the explanations for each data field. All fields are required.
 ## 关于
 这是一个为第一代[镭豆空气质量监测器](http://originstech.com/products/laseregg/?lang=zh-hans)增加 HomeKit 支持的 [Homebridge](https://github.com/nfarina/homebridge) 插件。
 
-“镭豆”是一个好用且漂亮的空气质量监测器是。第一代镭豆产品并没有支持苹果的 HomeKit，较新的型号才有。如果你不需要新款镭豆的其他功能，只需要 HomeKit 支援，又想省点钱，那么请使用本插件。
+“镭豆”是一个好用且漂亮的空气质量监测器。但第一代镭豆产品并没有支持苹果的 HomeKit，较新的型号才有。如果你不需要新款镭豆的其他功能，只需要 HomeKit 支援，又想省点钱，那么请使用本插件。
 
 这个插件的灵感来自 [homebridge-airnow](https://github.com/ToddGreenfield/homebridge-airnow) 插件，它通过读取第三方 API 接口获取数据。虽然镭豆并没有开放 API 接口，但我们分析了 iOS 应用的流量，找到了数据源。更有趣的是，这些数据并未加密。
 
-于是，[@ohdarling88](https://twitter.com/ohdarling88)写了所有的代码，发现数据源的[@bfishadow](https://twitter.com/bfishadow)撰写了本教程。
+于是，[@ohdarling88](https://twitter.com/ohdarling88) 写了所有的代码，发现数据源的 [@bfishadow](https://twitter.com/bfishadow) 撰写了本教程。
 
 ## 用法
 1. 通过这个指令安装本插件：`npm install -g homebridge-laser-egg`；
