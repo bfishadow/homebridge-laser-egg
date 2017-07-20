@@ -99,7 +99,7 @@ Here are the explanations for each data field. All fields are required.
 ```
 
 以下是各个字段的含义，所有字段都是必须填写的。
-1. `accessory`  HomKit 设备的名字，这里必须使用 "`laser-egg`" （全部为小写字母）。
+1. `accessory`  HomeKit 配件的名称，这里必须使用 "`laser-egg`" （全部为小写字母）。
 2. `name`  设备的名字（或昵称），这将显示在 Home 应用里。请不要设置得过长，以免被截断之后难以确认设备的位置。
 3. `laser_egg_id`  这将告诉插件应该去获取哪一个镭豆的数据。
 4. `polling`  数据抓取的间隔，以分钟为单位。我们认为五分钟已经足够，请不要滥用数据接口。
