@@ -7,8 +7,9 @@ This is a [Homebridge](https://github.com/nfarina/homebridge) plugin to add Home
 Laser Egg is a sleek AQI monitor. However the 1st gen Laser Eggs don’t have HomeKit support, while the newer model does. This plugin will save some money if you don’t need more features but the HomeKit integration.
 
 ## Usage
-1. Install this plugin by `npm install -g homebridge-laser-egg`
-2. Update the `config.json` file to add accessory.
+1. Install this plugin by `npm install -g homebridge-laser-egg` or via homebridge UI
+2. replace the index.js file from this fork, typically in `/var/lib/homebridge/node_modules/homebridge-laser-egg` on the Pi4
+3. Update the `config.json` file to add accessory. You can do this directly on homebridge web UI by clicking on settings on the plugin.
 
 ## Config
 ### Getting the UDID & API key
