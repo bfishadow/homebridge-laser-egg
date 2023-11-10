@@ -66,7 +66,7 @@ function LaserEggAccessory(log, config) {
 
 LaserEggAccessory.prototype = {
   servicePolling: function() {
-    this.log.info('Laser Egg Polling...');
+    this.log.debug('Laser Egg Polling...');
     this.getObservation(
       function(p) {
         var that = this;
@@ -97,7 +97,7 @@ LaserEggAccessory.prototype = {
       },
       function(err, response, jsonObject) {
             if (!err && response.statusCode === 200 && String(jsonObject.id) === String(that.laser_egg_id)){
-                that.log.info("Laser Egg PM2.5: %d, PM10: %d", jsonObject["info.aqi"]["data"]["pm25"], jsonObject["info.aqi"]["data"]["pm10"]);
+                that.log.debug("Laser Egg PM2.5: %d, PM10: %d", jsonObject["info.aqi"]["data"]["pm25"], jsonObject["info.aqi"]["data"]["pm10"]);
                 that.airQualityService.setCharacteristic(Characteristic.StatusFault,0);
                 if (jsonObject["info.aqi"]["data"].hasOwnProperty('pm25')) {
                     that.airQualityService.setCharacteristic(Characteristic.PM2_5Density, jsonObject["info.aqi"]["data"]["pm25"]);
@@ -114,7 +114,7 @@ LaserEggAccessory.prototype = {
           );
         }
         var aqi = that.calcAQI(pm2_5);
-        that.log.info('Laser Egg AQI: %d', aqi);
+        that.log.debug('Laser Egg AQI: %d', aqi);
         callback(that.trans_aqi(aqi));
       }
     );
