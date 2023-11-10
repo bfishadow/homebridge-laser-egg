@@ -1,10 +1,10 @@
 {
     "author": {
-        "name": "@ohdarling88, @bfishadow",
-        "email": "github@gongm.in"
+        "name": "@moh1t, @bfishadow, @ohdarling88, ",
+        "email": "contact@mohit.info"
     },
     "bugs": {
-        "url": "https://github.com/bfishadow/homebridge-laser-egg/issues"
+        "url": "https://github.com/moh1t/homebridge-laser-egg/issues"
     },
     "bundleDependencies": false,
     "dependencies": {
@@ -18,7 +18,7 @@
         "homebridge": ">=0.2.0",
         "node": ">=0.12.0"
     },
-    "homepage": "https://github.com/bfishadow/homebridge-laser-egg/",
+    "homepage": "https://github.com/moh1t/homebridge-laser-egg/",
     "keywords": [
         "homebridge-plugin",
         "homebridge",
@@ -31,7 +31,7 @@
     "name": "homebridge-laser-egg",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/bfishadow/homebridge-laser-egg.git"
+        "url": "git+https://github.com/moh1t/homebridge-laser-egg.git"
     },
     "scripts": {
         "test": "echo \"Error: \" && exit 1"

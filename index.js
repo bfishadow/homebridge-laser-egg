@@ -38,6 +38,7 @@ function LaserEggAccessory(log, config) {
   this.name = config['name'];
   this.provider = lowerCase(config['provider']) || 'laser-egg';
   this.laser_egg_id = config['laser_egg_id'];
+  this.laser_egg_key = config['laser_egg_key'];
   this.mpolling = config['polling'] || '0';
   this.polling = this.mpolling;
 
@@ -47,6 +48,8 @@ function LaserEggAccessory(log, config) {
     );
   }
 
+  if (!this.laser_egg_key) throw new Error("Laser Egg - You must provide a config value for 'laser_egg_key'.");
+  
   if (this.polling > 0) {
     var that = this;
     this.polling *= 60000;
@@ -63,7 +66,7 @@ function LaserEggAccessory(log, config) {
 
 LaserEggAccessory.prototype = {
   servicePolling: function() {
-    this.log.info('Laser Egg Polling...');
+    this.log.debug('Laser Egg Polling...');
     this.getObservation(
       function(p) {
         var that = this;
@@ -85,9 +88,7 @@ LaserEggAccessory.prototype = {
     var that = this;
     var url, pm2_5;
 
-    url =
-      'http://api-ios.origins-china.cn:8080/topdata/getTopDetail?id=' +
-      this.laser_egg_id;
+    url = "https://api.kaiterra.cn/v1/lasereggs/" + this.laser_egg_id + "?key=" + this.laser_egg_key;
 
     request(
       {
@@ -95,33 +96,16 @@ LaserEggAccessory.prototype = {
         json: true,
       },
       function(err, response, jsonObject) {
-        if (
-          !err &&
-          response.statusCode === 200 &&
-          jsonObject.msg === 'Succeed'
-        ) {
-          that.log.info(
-            'Laser Egg PM2.5: %d, PM10: %d',
-            jsonObject.pm2_5,
-            jsonObject.pm10
-          );
-          that.airQualityService.setCharacteristic(
-            Characteristic.StatusFault,
-            0
-          );
-          if (jsonObject.hasOwnProperty('pm2_5')) {
-            that.airQualityService.setCharacteristic(
-              Characteristic.PM2_5Density,
-              jsonObject.pm2_5
-            );
-            pm2_5 = jsonObject.pm2_5;
-          }
-          if (jsonObject.hasOwnProperty('pm10')) {
-            that.airQualityService.setCharacteristic(
-              Characteristic.PM10Density,
-              jsonObject.pm10
-            );
-          }
+            if (!err && response.statusCode === 200 && String(jsonObject.id) === String(that.laser_egg_id)){
+                that.log.debug("Laser Egg PM2.5: %d, PM10: %d", jsonObject["info.aqi"]["data"]["pm25"], jsonObject["info.aqi"]["data"]["pm10"]);
+                that.airQualityService.setCharacteristic(Characteristic.StatusFault,0);
+                if (jsonObject["info.aqi"]["data"].hasOwnProperty('pm25')) {
+                    that.airQualityService.setCharacteristic(Characteristic.PM2_5Density, jsonObject["info.aqi"]["data"]["pm25"]);
+                    pm2_5 = jsonObject["info.aqi"]["data"]["pm25"];
+                }
+                if (jsonObject["info.aqi"]["data"].hasOwnProperty('pm10')) {
+                    that.airQualityService.setCharacteristic(Characteristic.PM10Density, jsonObject["info.aqi"]["data"]["pm10"]);
+                }
         } else {
           that.log.error('Laser Egg Unknown Error from %s.', that.provider);
           that.airQualityService.setCharacteristic(
@@ -130,7 +114,7 @@ LaserEggAccessory.prototype = {
           );
         }
         var aqi = that.calcAQI(pm2_5);
-        that.log.info('Laser Egg AQI: %d', aqi);
+        that.log.debug('Laser Egg AQI: %d', aqi);
         callback(that.trans_aqi(aqi));
       }
     );
